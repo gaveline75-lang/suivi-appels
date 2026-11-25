@@ -6,155 +6,198 @@
 <title>Suivi des appels · Le Distrib</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Suivi appels">
 <meta name="theme-color" content="#16294F">
 <meta name="robots" content="noindex, nofollow">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
 <link rel="icon" href="icon-192.png?v=2">
 <link rel="manifest" href="manifest.json?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root { --bleu:#16294F; --rouge:#E9001F; --texte:#24363D; --gris:#6B7A80; --fond:#F4F6F9; --bord:#DDE3EA; --vert:#1E8E5A; }
+  :root { --bleu:#16294F; --rouge:#E9001F; --texte:#24363D; --gris:#3D4F57; --bord:#DDE3EA; --vert:#1E8E5A; }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  html, body { margin:0; background:var(--fond); color:var(--texte); font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size:16px; }
-  header { background:#fff; border-bottom:1px solid var(--bord); padding:calc(env(safe-area-inset-top) + 12px) 18px 12px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:5; }
-  header img { height:30px; }
-  header .qui { font-size:13px; color:var(--gris); }
-  main { max-width:560px; margin:0 auto; padding:18px 16px calc(env(safe-area-inset-bottom) + 40px); }
-  h1 { font-size:22px; color:var(--bleu); margin:6px 0 4px; }
-  .sous { color:var(--gris); font-size:14px; margin:0 0 18px; }
-  .carte { background:#fff; border:1px solid var(--bord); border-radius:16px; padding:16px; margin-bottom:14px; box-shadow:0 1px 2px rgba(22,41,79,.05); }
-  .etapes { display:flex; gap:10px; }
-  .etapes div { flex:1; font-size:12.5px; color:var(--gris); text-align:center; }
-  .etapes b { display:block; width:26px; height:26px; line-height:26px; margin:0 auto 6px; border-radius:50%; background:var(--bleu); color:#fff; font-size:13px; }
-  .micro-zone { text-align:center; padding:10px 0 4px; }
-  .micro { width:132px; height:132px; border-radius:50%; border:none; background:var(--rouge); color:#fff; display:inline-flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(233,0,31,.28); cursor:pointer; }
-  .micro svg { width:52px; height:52px; }
-  .micro.rec { background:var(--bleu); animation:pulse 1.4s infinite; box-shadow:0 8px 24px rgba(22,41,79,.3); }
-  @keyframes pulse { 0%{transform:scale(1)} 50%{transform:scale(1.05)} 100%{transform:scale(1)} }
-  .chrono { font-variant-numeric:tabular-nums; font-size:28px; font-weight:600; color:var(--bleu); margin-top:12px; }
-  .aide { font-size:14px; color:var(--gris); margin-top:6px; }
-  .lien { background:none; border:none; color:var(--bleu); font-size:14px; text-decoration:underline; cursor:pointer; padding:8px; }
-  label { display:block; font-size:13px; font-weight:600; color:var(--bleu); margin:12px 0 6px; }
-  input, select, textarea { width:100%; font:inherit; font-size:16px; color:var(--texte); border:1px solid var(--bord); border-radius:12px; padding:11px 12px; background:#fff; }
-  textarea { min-height:110px; resize:vertical; }
-  input:focus, select:focus, textarea:focus { outline:2px solid rgba(22,41,79,.25); border-color:var(--bleu); }
-  .ligne2 { display:flex; gap:10px; } .ligne2 > div { flex:1; }
-  .btn { display:block; width:100%; border:none; border-radius:999px; padding:15px 18px; font:inherit; font-weight:600; font-size:16px; cursor:pointer; margin-top:14px; }
+  html, body { margin:0; height:100%; background:var(--bleu); color:#fff; font-family:Inter, -apple-system, sans-serif; font-size:16px; }
+  body { overflow:hidden; }
+  .ecran { position:fixed; inset:0; display:flex; flex-direction:column; padding:calc(env(safe-area-inset-top) + 18px) 18px calc(env(safe-area-inset-bottom) + 16px); max-width:560px; margin:0 auto; }
+  .cache { display:none !important; }
+  .poppins { font-family:Poppins, sans-serif; }
+  .err { position:fixed; left:12px; right:12px; top:calc(env(safe-area-inset-top) + 10px); z-index:50; background:#FDECEE; color:#9B0015; border-radius:14px; padding:12px 14px; font-size:14px; box-shadow:0 8px 24px rgba(0,0,0,.25); }
+  .carte { background:#fff; color:var(--texte); border-radius:20px; }
+  a.lien, button.lien { background:none; border:none; color:#fff; font:inherit; font-size:15px; font-weight:600; text-decoration:underline; padding:8px; cursor:pointer; }
+  .btn { display:block; width:100%; height:54px; border:none; border-radius:999px; font-family:Poppins, sans-serif; font-weight:700; font-size:17px; cursor:pointer; }
   .btn-rouge { background:var(--rouge); color:#fff; }
   .btn-bleu { background:var(--bleu); color:#fff; }
-  .btn-clair { background:#fff; color:var(--bleu); border:1.5px solid var(--bleu); }
-  .btn:disabled { opacity:.5; }
-  .choix { border:1.5px solid var(--bord); border-radius:12px; padding:12px; margin-bottom:8px; cursor:pointer; background:#fff; }
-  .choix.actif { border-color:var(--bleu); background:#EEF2F8; }
-  .choix b { color:var(--bleu); }
-  .petit { font-size:13px; color:var(--gris); }
-  .recherche { display:flex; gap:8px; margin-top:6px; } .recherche input { flex:1; } .recherche button { width:auto; margin:0; padding:0 18px; }
-  .case { display:flex; align-items:center; gap:10px; margin-top:14px; font-size:15px; } .case input { width:22px; height:22px; }
-  details { margin-top:14px; } summary { cursor:pointer; font-size:14px; color:var(--bleu); font-weight:600; }
-  .transcr { white-space:pre-wrap; font-size:14px; color:var(--gris); margin-top:8px; }
-  .err { background:#FDECEE; color:#9B0015; border:1px solid #F5C2C8; border-radius:12px; padding:12px 14px; margin-bottom:14px; font-size:14px; }
-  .attente { text-align:center; padding:50px 10px; }
-  .roue { width:46px; height:46px; border:4px solid #DDE3EA; border-top-color:var(--rouge); border-radius:50%; margin:0 auto 18px; animation:tour 0.9s linear infinite; }
-  @keyframes tour { to { transform:rotate(360deg); } }
-  .ok { width:64px; height:64px; border-radius:50%; background:var(--vert); color:#fff; display:flex; align-items:center; justify-content:center; font-size:34px; margin:0 auto 12px; }
-  .complement-rec { display:flex; align-items:center; gap:12px; margin-top:8px; }
-  .mini-micro { width:56px; height:56px; border-radius:50%; border:none; background:var(--rouge); color:#fff; flex:none; display:flex; align-items:center; justify-content:center; cursor:pointer; }
-  .mini-micro svg { width:26px; height:26px; } .mini-micro.rec { background:var(--bleu); animation:pulse 1.4s infinite; }
-  .cache { display:none !important; }
+  /* Accueil : le logo s'assemble */
+  .hexa { position:relative; width:190px; height:160px; border:none; padding:0; background:#fff; clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%); cursor:pointer; }
+  .hexa svg { position:absolute; left:0; top:0; }
+  .gauche { animation:gauche .8s cubic-bezier(.2,.8,.2,1) .15s both; }
+  .droite { animation:droite .8s cubic-bezier(.2,.8,.2,1) .15s both; }
+  .micro { animation:pop .5s ease-out 1s both; }
+  @keyframes gauche { from { transform:translateX(-70px); opacity:0; } to { transform:none; opacity:1; } }
+  @keyframes droite { from { transform:translateX(70px); opacity:0; } to { transform:none; opacity:1; } }
+  @keyframes pop { 0% { opacity:0; transform:scale(.4); } 70% { transform:scale(1.08); } 100% { opacity:1; transform:none; } }
+  @keyframes monte { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+  .monte { animation:monte .5s ease-out both; }
+  .halo { position:absolute; width:230px; height:230px; border-radius:50%; background:rgba(255,255,255,.10); animation:halo 2s ease-out infinite; }
+  .enreg .halo { background:rgba(233,0,31,.45); animation-duration:1.1s; }
+  @keyframes halo { 0% { transform:scale(.85); opacity:.6; } 100% { transform:scale(1.35); opacity:0; } }
+  @keyframes respire { 0%,100% { transform:scale(1); } 50% { transform:scale(1.06); } }
+  @keyframes point { 0%,80%,100% { opacity:.25; } 40% { opacity:1; } }
+  .rap { display:flex; align-items:center; gap:12px; padding:9px 12px; border:1px solid var(--bord); border-radius:14px; }
+  .rap .h { font-family:Poppins, sans-serif; font-weight:600; color:var(--bleu); width:62px; flex:none; font-size:14px; line-height:1.2; }
+  .rap .h small { display:block; font-family:Inter, sans-serif; font-weight:500; font-size:11px; color:var(--gris); }
+  .rap .t { font-weight:600; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .rap .s { font-size:12px; color:var(--gris); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  /* Volet d'écriture et de transcription */
+  .voile { position:fixed; inset:0; background:rgba(10,20,40,.55); z-index:20; display:flex; align-items:flex-end; justify-content:center; }
+  .volet { width:100%; max-width:560px; background:#fff; color:var(--texte); border-radius:24px 24px 0 0; padding:18px 18px calc(env(safe-area-inset-bottom) + 18px); animation:monte .3s ease-out both; }
+  textarea, input[type=text], input[type=date], input[type=time] { width:100%; font:inherit; font-size:16px; color:var(--texte); border:1px solid var(--bord); border-radius:12px; padding:0 12px; height:42px; background:#fff; -webkit-appearance:none; appearance:none; }
+  textarea { padding:10px 12px; resize:none; line-height:1.35; }
+  label.l { display:block; font-size:12px; font-weight:600; color:var(--gris); margin-bottom:5px; }
+  /* Fiche */
+  .chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .chip { height:34px; padding:0 12px; border-radius:999px; border:1px solid #C9D3E0; background:#fff; color:var(--bleu); font:inherit; font-size:14px; font-weight:600; cursor:pointer; }
+  .chip.on { background:var(--rouge); border-color:var(--rouge); color:#fff; }
+  .choix { display:flex; align-items:center; gap:10px; padding:10px 12px; border:1.5px solid var(--bord); border-radius:14px; cursor:pointer; background:#fff; width:100%; text-align:left; font:inherit; color:var(--texte); }
+  .choix.on { border-color:var(--bleu); background:#EEF2F8; }
+  .ligne { display:flex; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px solid #EEF2F8; font-size:14px; }
+  .ligne:last-child { border-bottom:none; }
+  .ligne span { color:var(--gris); } .ligne b { color:var(--bleu); text-align:right; }
 </style>
 </head>
 <body>
-<header>
-  <img src="https://www.ledistrib.fr/wp-content/uploads/2026/02/LeDistrib-logo-1024x299.png" alt="Le Distrib">
-  <span class="qui" id="qui"></span>
-</header>
-<main>
-  <div id="err" class="err cache"></div>
+<div id="err" class="err cache" role="alert"></div>
 
-  <section id="ecranCle" class="cache">
-    <div class="carte"><h1>Lien incomplet</h1><p class="sous">Ouvre l'application avec le lien personnel envoyé par Gaëtan.</p></div>
-  </section>
+<!-- Lien sans clé -->
+<section id="ecranCle" class="ecran cache" style="justify-content:center; align-items:center; text-align:center; gap:12px">
+  <div class="poppins" style="font-size:24px; font-weight:700">Lien incomplet</div>
+  <div style="color:rgba(255,255,255,.8); max-width:280px; line-height:1.5">Ouvrez l'application avec le lien personnel envoyé par Gaëtan.</div>
+</section>
 
-  <section id="ecranAccueil" class="cache">
-    <h1 id="bonjour">Suivi des appels</h1>
-    <p class="sous">Raccroche, dicte ton compte rendu, vérifie, valide. Le CRM et ton agenda se mettent à jour.</p>
-    <div class="carte">
-      <div class="etapes"><div><b>1</b>Tu parles</div><div><b>2</b>Tu vérifies</div><div><b>3</b>Tu valides</div></div>
-    </div>
-    <div class="carte micro-zone">
-      <button class="micro" id="btnMicro" onclick="basculerMicro()" aria-label="Enregistrer">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-2.08A7 7 0 0 0 19 12h-2Z"/></svg>
+<!-- Accueil -->
+<section id="ecranAccueil" class="ecran cache" style="gap:10px">
+  <div class="monte" style="animation-delay:.9s; text-align:center; padding-top:8px">
+    <div class="poppins" id="bonjour" style="font-size:16px; font-weight:600; color:rgba(255,255,255,.75)">Bonjour</div>
+    <div class="poppins" style="font-size:27px; font-weight:700; line-height:1.2; margin-top:4px">Comment s'est passé<br>votre appel&nbsp;?</div>
+  </div>
+  <div id="zoneLogo" style="flex:1; min-height:230px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px">
+    <div style="position:relative; display:flex; align-items:center; justify-content:center; width:260px; height:220px">
+      <div class="halo"></div>
+      <button class="hexa" id="btnMicro" onclick="basculerMicro()" aria-label="Dicter mon compte rendu">
+        <svg class="gauche" aria-hidden="true" width="190" height="160" viewBox="0 0 64 54"><polygon points="16,0 32,0 16.5,27 32,54 16,54 0,27" fill="#16294F"></polygon></svg>
+        <svg class="droite" aria-hidden="true" width="190" height="160" viewBox="0 0 64 54"><polygon points="32,0 48,0 64,27 48,54 32,54" fill="#E9001F"></polygon></svg>
+        <svg class="micro" aria-hidden="true" width="190" height="160" viewBox="0 0 64 54"><g transform="translate(37.8 16.8) scale(0.85)" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0"></path><path d="M12 18v4"></path></g></svg>
       </button>
-      <div class="chrono" id="chrono">0:00</div>
-      <div class="aide" id="aideMicro">Appuie et parle : commune, interlocuteur, ce qui a été dit, la suite.</div>
     </div>
-    <div class="carte" id="zoneTexte">
-      <label for="texte">Tu préfères écrire ? <span style="font-weight:400;color:var(--gris)">Ton compte rendu ici</span></label>
-      <textarea id="texte" placeholder="Ex : appel mairie de Gouy, la secrétaire Mme Martin, intéressés, rappeler lundi 10h pour parler au maire."></textarea>
-      <button class="btn btn-bleu" onclick="envoyerTexte()">Analyser mon compte rendu</button>
-    </div>
-  </section>
+    <div class="poppins cache" id="chrono" style="font-size:26px; font-weight:600">0:00</div>
+    <div class="monte" id="aideMicro" style="animation-delay:1.3s; font-size:15px; color:rgba(255,255,255,.85); text-align:center">Appuyez sur le logo et racontez</div>
+  </div>
+  <div class="carte monte" id="carteRappels" style="animation-delay:1.6s; padding:14px; display:flex; flex-direction:column; gap:8px">
+    <div class="poppins" id="titreRappels" style="font-size:15px; font-weight:700; color:var(--bleu); padding:0 4px">Vos rappels</div>
+    <div id="listeRappels" style="display:flex; flex-direction:column; gap:8px"><div style="font-size:14px; color:var(--gris); padding:4px">Chargement…</div></div>
+  </div>
+  <div class="monte" style="animation-delay:1.9s; text-align:center"><button class="lien" onclick="ouvrirEcrire()">Je préfère écrire</button></div>
+</section>
 
-  <section id="ecranAttente" class="cache">
-    <div class="attente"><div class="roue"></div><div id="msgAttente">Analyse en cours…</div><div class="petit" style="margin-top:6px">Ça prend en général 10 à 30 secondes.</div></div>
-  </section>
+<!-- Analyse en cours -->
+<section id="ecranAttente" class="ecran cache" style="align-items:center; justify-content:center; gap:22px; text-align:center">
+  <div style="position:relative; width:230px; height:200px; display:flex; align-items:center; justify-content:center">
+    <div class="halo" style="width:210px; height:210px; animation-duration:1.6s"></div>
+    <div style="position:relative; width:170px; height:143px; background:#fff; clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%); display:flex; align-items:center; justify-content:center; animation:respire 1.6s ease-in-out infinite">
+      <svg aria-hidden="true" width="130" height="110" viewBox="0 0 64 54"><polygon points="16,0 32,0 16.5,27 32,54 16,54 0,27" fill="#16294F"></polygon><polygon points="32,0 48,0 64,27 48,54 32,54" fill="#E9001F"></polygon></svg>
+    </div>
+  </div>
+  <div class="poppins" id="msgAttente" style="font-size:24px; font-weight:700; line-height:1.25">Je prépare votre fiche</div>
+  <div style="display:flex; gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:#fff;animation:point 1s 0s infinite"></span><span style="width:8px;height:8px;border-radius:50%;background:#fff;animation:point 1s .15s infinite"></span><span style="width:8px;height:8px;border-radius:50%;background:#fff;animation:point 1s .3s infinite"></span></div>
+  <div style="font-size:15px; color:rgba(255,255,255,.75); max-width:290px; line-height:1.5">Transcription et rapprochement avec votre liste de communes. Comptez 20 à 60 secondes.</div>
+</section>
 
-  <section id="ecranFiche" class="cache">
-    <h1>Vérifie la fiche</h1>
-    <p class="sous">Corrige si besoin, puis valide.</p>
-    <div class="carte">
-      <label>Commune</label>
-      <div id="choixCommunes"></div>
-      <div class="recherche"><input id="autreCommune" placeholder="Autre commune"><button class="btn btn-clair" onclick="chercher()">Chercher</button></div>
+<!-- Vérification de la fiche -->
+<section id="ecranFiche" class="ecran cache" style="gap:9px; overflow-y:auto">
+  <div style="display:flex; align-items:center; gap:12px; padding:0 4px">
+    <svg aria-hidden="true" width="36" height="30" viewBox="0 0 64 54"><polygon points="16,0 32,0 16.5,27 32,54 16,54 0,27" fill="#fff"></polygon><polygon points="32,0 48,0 64,27 48,54 32,54" fill="#E9001F"></polygon></svg>
+    <div><div class="poppins" style="font-size:20px; font-weight:700; line-height:1.15">Vérifiez la fiche</div><div style="font-size:13px; color:rgba(255,255,255,.75)">Corrigez si besoin, puis validez.</div></div>
+  </div>
+  <div class="carte" id="carteCommune" style="padding:12px 14px"></div>
+  <div class="carte" style="padding:13px 14px; display:flex; flex-direction:column; gap:10px">
+    <div><div class="l" style="font-size:12px; font-weight:600; color:var(--gris); margin-bottom:5px">Résultat de l'appel</div><div class="chips" id="chipsResultat"></div></div>
+    <div><label class="l" for="fInterlocuteur">Interlocuteur</label><input type="text" id="fInterlocuteur"></div>
+    <div id="blocRappel" style="display:flex; gap:8px">
+      <div style="flex:1.5"><label class="l" for="fDateRappel">Rappel le</label><input type="date" id="fDateRappel"></div>
+      <div style="flex:1"><label class="l" for="fHeureRappel">à</label><input type="time" id="fHeureRappel"></div>
     </div>
-    <div class="carte">
-      <label for="fResultat">Résultat de l'appel</label><select id="fResultat"></select>
-      <label for="fInterlocuteur">Interlocuteur</label><input id="fInterlocuteur">
-      <label for="fResume">Résumé</label><textarea id="fResume"></textarea>
-      <label for="fAction">Prochaine action</label><input id="fAction">
-      <div class="ligne2"><div><label for="fDateRappel">Rappel le</label><input type="date" id="fDateRappel"></div><div><label for="fHeureRappel">à</label><input type="time" id="fHeureRappel"></div></div>
-      <div class="ligne2"><div><label for="fDateRdv">RDV sur place le</label><input type="date" id="fDateRdv"></div><div><label for="fHeureRdv">à</label><input type="time" id="fHeureRdv"></div></div>
-      <label class="case"><input type="checkbox" id="fNpc"> Ne plus contacter</label>
-      <details><summary>Ce que tu as dit</summary><div class="transcr" id="fTranscription"></div></details>
+    <div id="blocRdv" class="cache" style="display:flex; gap:8px">
+      <div style="flex:1.5"><label class="l" for="fDateRdv">RDV sur place le</label><input type="date" id="fDateRdv"></div>
+      <div style="flex:1"><label class="l" for="fHeureRdv">à</label><input type="time" id="fHeureRdv"></div>
     </div>
-    <div class="carte">
-      <label>Tu as oublié quelque chose ?</label>
-      <div class="complement-rec">
-        <button class="mini-micro" id="btnComp" onclick="basculerComplement()" aria-label="Compléter à la voix">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-2.08A7 7 0 0 0 19 12h-2Z"/></svg>
-        </button>
-        <div class="petit" id="aideComp">Appuie et dis juste ce qui manque. La fiche se met à jour, le reste est gardé.</div>
-      </div>
+    <div><label class="l" for="fResume">Résumé</label><textarea id="fResume" style="height:60px"></textarea></div>
+    <div><label class="l" for="fAction">Prochaine action</label><input type="text" id="fAction"></div>
+    <div style="display:flex; align-items:center; justify-content:space-between">
+      <label style="display:flex; align-items:center; gap:8px; font-size:14px"><input type="checkbox" id="fNpc" style="width:20px; height:20px"> Ne plus contacter</label>
+      <button onclick="ouvrirTranscription()" style="background:none; border:none; font:inherit; font-size:14px; font-weight:600; color:var(--bleu); text-decoration:underline; padding:4px">Ce que vous avez dit</button>
     </div>
-    <button class="btn btn-rouge" onclick="valider()">Valider et enregistrer</button>
-    <button class="btn btn-clair" onclick="recommencer()">Annuler</button>
-  </section>
+  </div>
+  <div style="display:flex; align-items:center; gap:12px; padding:2px 4px">
+    <button id="btnComp" onclick="basculerComplement()" aria-label="Compléter à la voix" style="position:relative; width:52px; height:46px; flex:none; border:none; padding:0; background:#fff; clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%); cursor:pointer">
+      <svg aria-hidden="true" width="52" height="46" viewBox="0 0 64 54" style="position:absolute; left:0; top:0"><polygon points="16,0 32,0 16.5,27 32,54 16,54 0,27" fill="#16294F"></polygon><polygon points="32,0 48,0 64,27 48,54 32,54" fill="#E9001F"></polygon><g transform="translate(37.8 16.8) scale(0.85)" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0"></path><path d="M12 18v4"></path></g></svg>
+    </button>
+    <div style="font-size:14px; line-height:1.4"><b class="poppins">Un oubli ?</b><br><span id="aideComp" style="color:rgba(255,255,255,.75)">Appuyez et complétez à la voix.</span></div>
+  </div>
+  <div style="flex:1"></div>
+  <button class="btn btn-rouge" onclick="valider()">Valider et enregistrer</button>
+  <div style="text-align:center"><button class="lien" style="font-weight:500; padding:4px" onclick="recommencer()">Annuler</button></div>
+</section>
 
-  <section id="ecranFin" class="cache">
-    <div class="carte" style="text-align:center"><div class="ok">✓</div><div id="bilan"></div></div>
-    <button class="btn btn-rouge" onclick="recommencer()">Nouvel appel</button>
-  </section>
-</main>
+<!-- Enregistré -->
+<section id="ecranFin" class="ecran cache" style="gap:16px">
+  <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; text-align:center">
+    <div style="width:96px; height:96px; border-radius:50%; background:#fff; color:var(--vert); display:flex; align-items:center; justify-content:center; animation:pop .6s ease-out .1s both"><svg aria-hidden="true" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"></path></svg></div>
+    <div class="poppins monte" style="animation-delay:.35s; font-size:26px; font-weight:700">C'est enregistré</div>
+    <div class="monte" id="sousFin" style="animation-delay:.45s; font-size:15px; color:rgba(255,255,255,.75); max-width:290px; line-height:1.45">Le CRM est à jour.</div>
+  </div>
+  <div class="carte monte" id="bilan" style="animation-delay:.6s; padding:6px 16px"></div>
+  <button class="btn btn-rouge monte" style="animation-delay:.75s" onclick="recommencer()">Nouvel appel</button>
+</section>
+
+<!-- Volets -->
+<div id="voileEcrire" class="voile cache" onclick="if(event.target===this)fermerVolets()">
+  <div class="volet">
+    <label for="texte" class="poppins" style="display:block; font-weight:700; color:var(--bleu); font-size:16px; margin-bottom:10px">Votre compte rendu</label>
+    <textarea id="texte" style="height:130px" placeholder="Ex : mairie de Gouy, la secrétaire Mme Martin, intéressés, rappeler lundi 10h pour parler au maire."></textarea>
+    <button class="btn btn-bleu" style="margin-top:12px" onclick="envoyerTexte()">Analyser</button>
+    <div style="text-align:center"><button class="lien" style="color:var(--gris); font-weight:500" onclick="fermerVolets()">Fermer</button></div>
+  </div>
+</div>
+<div id="voileTranscr" class="voile cache" onclick="if(event.target===this)fermerVolets()">
+  <div class="volet">
+    <div class="poppins" style="font-weight:700; color:var(--bleu); font-size:16px; margin-bottom:10px">Ce que vous avez dit</div>
+    <div id="fTranscription" style="white-space:pre-wrap; font-size:15px; line-height:1.5; max-height:50vh; overflow-y:auto; color:var(--texte)"></div>
+    <div style="text-align:center; margin-top:8px"><button class="lien" style="color:var(--gris); font-weight:500" onclick="fermerVolets()">Fermer</button></div>
+  </div>
+</div>
 
 <script>
 const API = 'https://script.google.com/macros/s/AKfycbzn92nlgNbxlAz1j2ii8is320C1FFUCKLNtatm63LqEADXvqSKyqfLhKS_qHpz6SxX5/exec';
 const MAX_SEC = 240;
-let CLE = '', session = null, ligneChoisie = null, candidats = [], ficheCourante = null;
-let rec = null; // enregistrement en cours : { ctx, source, proc, flux, morceaux, taux, t0, minuteur, cible }
+const COURT = { 'Joint, intéressé': 'Intéressé', 'Joint, à rappeler': 'À rappeler', 'RDV pris': 'RDV pris', 'Refus': 'Refus', 'Pas joint (messagerie, absent)': 'Pas joint', 'Autre': 'Autre' };
+let CLE = '', session = null, ligneChoisie = null, candidats = [], resultats = [], resultat = '', ficheCourante = null, modeChoix = false;
+let rec = null;
 
 function $(id) { return document.getElementById(id); }
-function montrer(id) { ['ecranCle','ecranAccueil','ecranAttente','ecranFiche','ecranFin'].forEach(e => $(e).classList.toggle('cache', e !== id)); window.scrollTo(0, 0); }
-function erreur(m) { const z = $('err'); z.textContent = m || ''; z.classList.toggle('cache', !m); if (m) window.scrollTo(0, 0); }
+function montrer(id) { ['ecranCle','ecranAccueil','ecranAttente','ecranFiche','ecranFin'].forEach(e => $(e).classList.toggle('cache', e !== id)); }
+let minuteurErr = null;
+function erreur(m) { const z = $('err'); z.textContent = m || ''; z.classList.toggle('cache', !m); clearTimeout(minuteurErr); if (m) minuteurErr = setTimeout(() => z.classList.add('cache'), 7000); }
 function echap(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c])); }
 
 async function api(action, donnees) {
   let r;
   try {
     r = await fetch(API, { method:'POST', redirect:'follow', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ action, k: CLE }, donnees || {})) });
-  } catch (e) { throw new Error('Pas de connexion au serveur. Vérifie ton réseau et réessaie.'); }
+  } catch (e) { throw new Error('Pas de connexion au serveur. Vérifiez votre réseau et réessayez.'); }
   let j;
-  try { j = await r.json(); } catch (e) { throw new Error('Réponse illisible du serveur (code ' + r.status + '). Réessaie dans une minute.'); }
+  try { j = await r.json(); } catch (e) { throw new Error('Réponse illisible du serveur (code ' + r.status + '). Réessayez dans une minute.'); }
   if (!j.ok) throw new Error(j.erreur || 'Erreur inconnue.');
   return j.data;
 }
@@ -164,7 +207,7 @@ async function demarrerMicro(cible) {
   erreur('');
   let flux;
   try { flux = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation:true, noiseSuppression:true } }); }
-  catch (e) { erreur("Micro refusé. Sur iPhone : Réglages > Safari > Micro > Autoriser, puis recharge la page. Tu peux aussi écrire ton compte rendu."); return false; }
+  catch (e) { erreur("Micro refusé. Sur iPhone : Réglages > Safari > Micro > Autoriser. Vous pouvez aussi écrire votre compte rendu."); return false; }
   const ctx = new (window.AudioContext || window.webkitAudioContext)();
   if (ctx.state === 'suspended') await ctx.resume();
   const source = ctx.createMediaStreamSource(flux);
@@ -176,8 +219,8 @@ async function demarrerMicro(cible) {
   rec.minuteur = setInterval(() => {
     const s = Math.floor((Date.now() - rec.t0) / 1000);
     if (cible === 'principal') $('chrono').textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
-    else $('aideComp').textContent = 'Je t\'écoute… ' + s + ' s. Appuie pour terminer.';
-    if (s >= MAX_SEC) arreterMicro();
+    else $('aideComp').textContent = 'Je vous écoute… ' + s + ' s. Appuyez pour terminer.';
+    if (s >= MAX_SEC) { if (cible === 'principal') basculerMicro(); else basculerComplement(); }
   }, 250);
   return true;
 }
@@ -189,9 +232,8 @@ function arreterMicro() {
   try { r.source.disconnect(); r.proc.disconnect(); } catch (e) {}
   r.flux.getTracks().forEach(t => t.stop());
   r.ctx.close();
-  const duree = (Date.now() - r.t0) / 1000;
-  if (duree < 1.5) return { cible: r.cible, trop_court: true };
-  return { cible: r.cible, b64: wavBase64(r.morceaux, r.taux) };
+  if ((Date.now() - r.t0) / 1000 < 1.5) return { trop_court: true };
+  return { b64: wavBase64(r.morceaux, r.taux) };
 }
 
 function wavBase64(morceaux, taux) {
@@ -219,30 +261,31 @@ function wavBase64(morceaux, taux) {
 async function basculerMicro() {
   if (rec && rec.cible === 'principal') {
     const r = arreterMicro();
-    $('btnMicro').classList.remove('rec'); $('aideMicro').textContent = 'Appuie et parle : commune, interlocuteur, ce qui a été dit, la suite.';
-    if (!r || r.trop_court) { $('chrono').textContent = '0:00'; erreur('Enregistrement trop court. Réessaie.'); return; }
-    analyser({ audio: r.b64, mime: 'audio/wav' }, 'Analyse de ton vocal…');
+    $('zoneLogo').classList.remove('enreg'); $('chrono').classList.add('cache');
+    $('aideMicro').textContent = 'Appuyez sur le logo et racontez';
+    if (!r || r.trop_court) { erreur('Enregistrement trop court. Réessayez.'); return; }
+    analyser({ audio: r.b64, mime: 'audio/wav' }, 'Je prépare votre fiche');
     return;
   }
   if (rec) return;
   if (await demarrerMicro('principal')) {
-    $('btnMicro').classList.add('rec'); $('aideMicro').textContent = 'Je t\'écoute. Appuie à nouveau pour terminer.';
+    $('zoneLogo').classList.add('enreg'); $('chrono').textContent = '0:00'; $('chrono').classList.remove('cache');
+    $('aideMicro').textContent = 'Je vous écoute. Appuyez à nouveau pour terminer.';
   }
 }
 
 async function basculerComplement() {
   if (rec && rec.cible === 'complement') {
     const r = arreterMicro();
-    $('btnComp').classList.remove('rec'); $('aideComp').textContent = 'Appuie et dis juste ce qui manque. La fiche se met à jour, le reste est gardé.';
-    if (!r || r.trop_court) { erreur('Complément trop court. Réessaie.'); return; }
-    analyser({ audio: r.b64, mime: 'audio/wav', texte: texteActuel() }, 'J\'ajoute ton complément…');
+    $('btnComp').style.animation = ''; $('aideComp').textContent = 'Appuyez et complétez à la voix.';
+    if (!r || r.trop_court) { erreur('Complément trop court. Réessayez.'); return; }
+    analyser({ audio: r.b64, mime: 'audio/wav', texte: texteActuel() }, "J'ajoute votre complément");
     return;
   }
   if (rec) return;
-  if (await demarrerMicro('complement')) $('btnComp').classList.add('rec');
+  if (await demarrerMicro('complement')) $('btnComp').style.animation = 'respire 1s ease-in-out infinite';
 }
 
-// Ce qui est déjà compris, corrections manuelles comprises, pour que le complément ne perde rien.
 function texteActuel() {
   const f = lireFiche();
   return [f.transcription,
@@ -251,14 +294,18 @@ function texteActuel() {
   ].join('\n');
 }
 
-// ---------- Écrans ----------
-function basculerTexte() { $('zoneTexte').classList.toggle('cache'); if (!$('zoneTexte').classList.contains('cache')) $('texte').focus(); }
+// ---------- Volets ----------
+function ouvrirEcrire() { $('voileEcrire').classList.remove('cache'); setTimeout(() => $('texte').focus(), 50); }
+function ouvrirTranscription() { $('voileTranscr').classList.remove('cache'); }
+function fermerVolets() { $('voileEcrire').classList.add('cache'); $('voileTranscr').classList.add('cache'); }
 function envoyerTexte() {
   const t = $('texte').value.trim();
-  if (!t) { erreur('Écris ton compte rendu d\'abord.'); return; }
-  analyser({ texte: t }, 'Analyse de ton compte rendu…');
+  if (!t) { erreur("Écrivez votre compte rendu d'abord."); return; }
+  fermerVolets();
+  analyser({ texte: t }, 'Je prépare votre fiche');
 }
 
+// ---------- Analyse et fiche ----------
 async function analyser(donnees, msg) {
   erreur(''); $('msgAttente').textContent = msg; montrer('ecranAttente');
   const retour = ficheCourante ? 'ecranFiche' : 'ecranAccueil';
@@ -267,9 +314,11 @@ async function analyser(donnees, msg) {
 }
 
 function afficherFiche(r) {
-  session = r.id; candidats = r.candidats || []; ligneChoisie = null; ficheCourante = r.fiche;
+  session = r.id; candidats = r.candidats || []; resultats = r.resultats || []; ficheCourante = r.fiche;
   const f = r.fiche;
-  $('fResultat').innerHTML = (r.resultats || []).map(x => '<option' + (x === f.resultat ? ' selected' : '') + '>' + echap(x) + '</option>').join('');
+  ligneChoisie = candidats.length === 1 ? candidats[0].ligne : null;
+  modeChoix = candidats.length !== 1;
+  resultat = resultats.includes(f.resultat) ? f.resultat : (resultats[0] || '');
   $('fInterlocuteur').value = f.interlocuteur || '';
   $('fResume').value = f.resume || '';
   $('fAction').value = f.prochaine_action || '';
@@ -277,34 +326,48 @@ function afficherFiche(r) {
   $('fDateRdv').value = f.date_rdv || ''; $('fHeureRdv').value = f.heure_rdv || '';
   $('fNpc').checked = !!f.ne_plus_contacter;
   $('fTranscription').textContent = f.transcription || '';
-  $('autreCommune').value = candidats.length ? '' : (f.commune || '');
-  dessinerCommunes(f.commune);
-  montrer('ecranFiche');
+  dessinerResultats(); dessinerCommune(f.commune);
+  montrer('ecranFiche'); $('ecranFiche').scrollTop = 0;
 }
 
-function dessinerCommunes(entendu) {
-  const z = $('choixCommunes');
-  if (!candidats.length) {
-    z.innerHTML = '<div class="petit">Commune « ' + echap(entendu || '?') + ' » introuvable sur ta route. Tape le nom (même approximatif) puis « Chercher ».</div>';
+function dessinerResultats() {
+  $('chipsResultat').innerHTML = resultats.map((x, i) => '<button class="chip' + (x === resultat ? ' on' : '') + '" onclick="choisirResultat(' + i + ')">' + echap(COURT[x] || x) + '</button>').join('');
+  const rdv = resultat === 'RDV pris';
+  $('blocRdv').classList.toggle('cache', !rdv); $('blocRappel').classList.toggle('cache', rdv);
+}
+function choisirResultat(i) { resultat = resultats[i]; dessinerResultats(); }
+
+function dessinerCommune(entendu) {
+  const z = $('carteCommune');
+  const coche = '<div style="width:34px;height:34px;border-radius:50%;background:#E8F5EE;color:#1E8E5A;display:flex;align-items:center;justify-content:center;flex:none"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"></path></svg></div>';
+  const recherche = '<div style="display:flex; gap:8px; margin-top:8px"><input type="text" id="autreCommune" placeholder="Nom de la commune, même approximatif"><button class="chip" style="height:42px" onclick="chercher()">Chercher</button></div>';
+  const c = candidats.find(x => x.ligne === ligneChoisie);
+  if (c && !modeChoix) {
+    z.innerHTML = '<div style="display:flex; align-items:center; gap:12px">' + coche +
+      '<div style="flex:1; min-width:0"><div class="poppins" style="font-weight:700; color:var(--bleu); font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">' + echap(c.commune) + '</div>' +
+      '<div style="font-size:13px; color:var(--gris); white-space:nowrap; overflow:hidden; text-overflow:ellipsis">' + echap([c.maire, c.tel].filter(Boolean).join(' · ')) + '</div></div>' +
+      '<button onclick="changerCommune()" style="background:none;border:none;font:inherit;font-size:14px;font-weight:600;color:var(--bleu);text-decoration:underline;padding:4px">Changer</button></div>';
     return;
   }
-  if (candidats.length === 1) ligneChoisie = candidats[0].ligne;
-  z.innerHTML = candidats.map(c => '<div class="choix' + (c.ligne === ligneChoisie ? ' actif' : '') + '" onclick="choisir(' + c.ligne + ')"><b>' + echap(c.commune) + '</b>' +
-    (c.exact ? '' : ' <span class="petit">(nom proche)</span>') + '<div class="petit">' + echap(c.maire) + ' · ' + echap(c.tel) + (c.etape ? ' · ' + echap(c.etape) : '') + '</div></div>').join('');
+  const titre = candidats.length ? 'Quelle commune ?' : 'Commune « ' + echap(entendu || '?') + ' » introuvable sur votre route';
+  z.innerHTML = '<div class="poppins" style="font-weight:700; color:var(--bleu); font-size:15px; margin-bottom:8px">' + titre + '</div>' +
+    '<div style="display:flex; flex-direction:column; gap:6px">' + candidats.slice(0, 4).map(x =>
+      '<button class="choix' + (x.ligne === ligneChoisie ? ' on' : '') + '" onclick="choisir(' + x.ligne + ')"><div style="flex:1; min-width:0"><b style="color:var(--bleu)">' + echap(x.commune) + '</b>' +
+      (x.exact ? '' : ' <span style="font-size:12px; color:var(--gris)">(nom proche)</span>') +
+      '<div style="font-size:12px; color:var(--gris); white-space:nowrap; overflow:hidden; text-overflow:ellipsis">' + echap([x.maire, x.tel, x.etape].filter(Boolean).join(' · ')) + '</div></div></button>').join('') + '</div>' + recherche;
 }
-function choisir(l) { ligneChoisie = l; dessinerCommunes(''); }
-
+function choisir(l) { ligneChoisie = l; modeChoix = false; dessinerCommune(''); }
+function changerCommune() { modeChoix = true; dessinerCommune(''); }
 async function chercher() {
-  const n = $('autreCommune').value.trim();
-  if (!n) return;
+  const n = ($('autreCommune') || {}).value; if (!n || !n.trim()) return;
   erreur('');
-  try { candidats = await api('rechercher', { id: session, commune: n }); ligneChoisie = null; dessinerCommunes(n); }
+  try { candidats = await api('rechercher', { id: session, commune: n.trim() }); ligneChoisie = candidats.length === 1 ? candidats[0].ligne : null; modeChoix = candidats.length !== 1; dessinerCommune(n.trim()); }
   catch (e) { erreur(e.message); }
 }
 
 function lireFiche() {
   return {
-    resultat: $('fResultat').value, interlocuteur: $('fInterlocuteur').value.trim(), resume: $('fResume').value.trim(),
+    resultat: resultat, interlocuteur: $('fInterlocuteur').value.trim(), resume: $('fResume').value.trim(),
     prochaine_action: $('fAction').value.trim(), date_rappel: $('fDateRappel').value, heure_rappel: $('fHeureRappel').value,
     date_rdv: $('fDateRdv').value, heure_rdv: $('fHeureRdv').value, ne_plus_contacter: $('fNpc').checked,
     transcription: $('fTranscription').textContent
@@ -313,28 +376,46 @@ function lireFiche() {
 
 async function valider() {
   erreur('');
-  if (!ligneChoisie) { erreur('Choisis la commune.'); return; }
-  $('msgAttente').textContent = 'Enregistrement dans le CRM et l\'agenda…'; montrer('ecranAttente');
+  if (!ligneChoisie) { erreur('Choisissez la commune.'); return; }
+  $('msgAttente').textContent = "J'enregistre dans le CRM et l'agenda"; montrer('ecranAttente');
   try {
     const r = await api('valider', { id: session, ligne: ligneChoisie, fiche: lireFiche() });
-    $('bilan').innerHTML = '<b style="color:var(--bleu);font-size:18px">Enregistré : ' + echap(r.commune) + '</b><div class="petit" style="margin-top:10px;text-align:left">' +
-      Object.keys(r.ecrit || {}).map(k => '<b>' + echap(k) + '</b> : ' + echap(r.ecrit[k])).join('<br>') + '</div>' +
-      (r.agenda ? '<div style="margin-top:12px">📅 ' + echap(r.agenda.titre) + ', le ' + echap(r.agenda.debut) + '</div>' : '');
+    const lignes = [['Commune', r.commune], ['Résultat', COURT[resultat] || resultat]];
+    Object.keys(r.ecrit || {}).forEach(k => { if (/tape/i.test(k)) lignes.push(['Étape du pipeline', r.ecrit[k]]); });
+    if (r.agenda) lignes.push(["Rappel dans l'agenda", r.agenda.debut]);
+    $('bilan').innerHTML = lignes.map(l => '<div class="ligne"><span>' + echap(l[0]) + '</span><b>' + echap(l[1]) + '</b></div>').join('');
+    $('sousFin').textContent = r.agenda ? "Le CRM est à jour et le rappel est dans votre agenda, avec le contexte de la commune." : 'Le CRM est à jour.';
     $('texte').value = ''; ficheCourante = null;
     montrer('ecranFin');
   } catch (e) { erreur(e.message); montrer('ecranFiche'); }
 }
 
-function recommencer() { erreur(''); session = null; ligneChoisie = null; ficheCourante = null; $('chrono').textContent = '0:00'; montrer('ecranAccueil'); }
+function recommencer() { erreur(''); session = null; ligneChoisie = null; ficheCourante = null; montrer('ecranAccueil'); chargerProfil(); }
 
-// ---------- Démarrage : la clé vient du lien ?k=, puis est gardée sur le téléphone ----------
-(async function () {
+// ---------- Accueil ----------
+function dessinerRappels(liste) {
+  const auj = liste.filter(x => x.jour === "Aujourd'hui");
+  $('titreRappels').textContent = auj.length ? 'Vos rappels du jour' : 'Vos prochains rappels';
+  const aff = (auj.length ? auj : liste).slice(0, 3);
+  $('listeRappels').innerHTML = aff.length ? aff.map(x =>
+    '<div class="rap"><div class="h">' + echap(x.heure) + (x.jour !== "Aujourd'hui" ? '<small>' + echap(x.jour) + '</small>' : '') + '</div>' +
+    '<div style="flex:1; min-width:0"><div class="t">' + echap(x.titre) + '</div><div class="s">' + echap(x.sous) + '</div></div></div>').join('')
+    : '<div style="font-size:14px; color:var(--gris); padding:4px">Aucun rappel prévu cette semaine.</div>';
+}
+async function chargerProfil() {
+  try {
+    const u = await api('profil');
+    $('bonjour').textContent = 'Bonjour ' + u.prenom;
+    dessinerRappels(u.rappels || []);
+  } catch (e) { erreur(e.message); $('listeRappels').innerHTML = '<div style="font-size:14px; color:var(--gris); padding:4px">Rappels indisponibles pour le moment.</div>'; }
+}
+
+(function () {
   const p = new URLSearchParams(location.search).get('k');
   try { if (p) localStorage.setItem('ld_cle', p); CLE = p || localStorage.getItem('ld_cle') || ''; } catch (e) { CLE = p || ''; }
   if (!CLE) { montrer('ecranCle'); return; }
   montrer('ecranAccueil');
-  try { const u = await api('profil'); $('bonjour').textContent = 'Bonjour ' + u.prenom; $('qui').textContent = u.prenom; }
-  catch (e) { erreur(e.message); }
+  chargerProfil();
 })();
 </script>
 </body>
