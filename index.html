@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Suivi des appels · Le Distrib</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Suivi appels">
+<meta name="theme-color" content="#16294F">
+<meta name="robots" content="noindex, nofollow">
+<link rel="apple-touch-icon" href="https://www.ledistrib.fr/wp-content/uploads/2026/04/cropped-LeDistrib-Favicon-180x180.png">
+<link rel="icon" href="https://www.ledistrib.fr/wp-content/uploads/2026/04/cropped-LeDistrib-Favicon-180x180.png">
+<style>
+  :root { --bleu:#16294F; --rouge:#E9001F; --texte:#24363D; --gris:#6B7A80; --fond:#F4F6F9; --bord:#DDE3EA; --vert:#1E8E5A; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { margin:0; background:var(--fond); color:var(--texte); font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size:16px; }
+  header { background:#fff; border-bottom:1px solid var(--bord); padding:calc(env(safe-area-inset-top) + 12px) 18px 12px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:5; }
+  header img { height:30px; }
+  header .qui { font-size:13px; color:var(--gris); }
+  main { max-width:560px; margin:0 auto; padding:18px 16px calc(env(safe-area-inset-bottom) + 40px); }
+  h1 { font-size:22px; color:var(--bleu); margin:6px 0 4px; }
+  .sous { color:var(--gris); font-size:14px; margin:0 0 18px; }
+  .carte { background:#fff; border:1px solid var(--bord); border-radius:16px; padding:16px; margin-bottom:14px; box-shadow:0 1px 2px rgba(22,41,79,.05); }
+  .etapes { display:flex; gap:10px; }
+  .etapes div { flex:1; font-size:12.5px; color:var(--gris); text-align:center; }
+  .etapes b { display:block; width:26px; height:26px; line-height:26px; margin:0 auto 6px; border-radius:50%; background:var(--bleu); color:#fff; font-size:13px; }
+  .micro-zone { text-align:center; padding:10px 0 4px; }
+  .micro { width:132px; height:132px; border-radius:50%; border:none; background:var(--rouge); color:#fff; display:inline-flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(233,0,31,.28); cursor:pointer; }
+  .micro svg { width:52px; height:52px; }
+  .micro.rec { background:var(--bleu); animation:pulse 1.4s infinite; box-shadow:0 8px 24px rgba(22,41,79,.3); }
+  @keyframes pulse { 0%{transform:scale(1)} 50%{transform:scale(1.05)} 100%{transform:scale(1)} }
+  .chrono { font-variant-numeric:tabular-nums; font-size:28px; font-weight:600; color:var(--bleu); margin-top:12px; }
+  .aide { font-size:14px; color:var(--gris); margin-top:6px; }
+  .lien { background:none; border:none; color:var(--bleu); font-size:14px; text-decoration:underline; cursor:pointer; padding:8px; }
+  label { display:block; font-size:13px; font-weight:600; color:var(--bleu); margin:12px 0 6px; }
+  input, select, textarea { width:100%; font:inherit; font-size:16px; color:var(--texte); border:1px solid var(--bord); border-radius:12px; padding:11px 12px; background:#fff; }
+  textarea { min-height:110px; resize:vertical; }
+  input:focus, select:focus, textarea:focus { outline:2px solid rgba(22,41,79,.25); border-color:var(--bleu); }
+  .ligne2 { display:flex; gap:10px; } .ligne2 > div { flex:1; }
+  .btn { display:block; width:100%; border:none; border-radius:999px; padding:15px 18px; font:inherit; font-weight:600; font-size:16px; cursor:pointer; margin-top:14px; }
+  .btn-rouge { background:var(--rouge); color:#fff; }
+  .btn-bleu { background:var(--bleu); color:#fff; }
+  .btn-clair { background:#fff; color:var(--bleu); border:1.5px solid var(--bleu); }
+  .btn:disabled { opacity:.5; }
+  .choix { border:1.5px solid var(--bord); border-radius:12px; padding:12px; margin-bottom:8px; cursor:pointer; background:#fff; }
+  .choix.actif { border-color:var(--bleu); background:#EEF2F8; }
+  .choix b { color:var(--bleu); }
+  .petit { font-size:13px; color:var(--gris); }
+  .recherche { display:flex; gap:8px; margin-top:6px; } .recherche input { flex:1; } .recherche button { width:auto; margin:0; padding:0 18px; }
+  .case { display:flex; align-items:center; gap:10px; margin-top:14px; font-size:15px; } .case input { width:22px; height:22px; }
+  details { margin-top:14px; } summary { cursor:pointer; font-size:14px; color:var(--bleu); font-weight:600; }
+  .transcr { white-space:pre-wrap; font-size:14px; color:var(--gris); margin-top:8px; }
+  .err { background:#FDECEE; color:#9B0015; border:1px solid #F5C2C8; border-radius:12px; padding:12px 14px; margin-bottom:14px; font-size:14px; }
+  .attente { text-align:center; padding:50px 10px; }
+  .roue { width:46px; height:46px; border:4px solid #DDE3EA; border-top-color:var(--rouge); border-radius:50%; margin:0 auto 18px; animation:tour 0.9s linear infinite; }
+  @keyframes tour { to { transform:rotate(360deg); } }
+  .ok { width:64px; height:64px; border-radius:50%; background:var(--vert); color:#fff; display:flex; align-items:center; justify-content:center; font-size:34px; margin:0 auto 12px; }
+  .complement-rec { display:flex; align-items:center; gap:12px; margin-top:8px; }
+  .mini-micro { width:56px; height:56px; border-radius:50%; border:none; background:var(--rouge); color:#fff; flex:none; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .mini-micro svg { width:26px; height:26px; } .mini-micro.rec { background:var(--bleu); animation:pulse 1.4s infinite; }
+  .cache { display:none !important; }
+</style>
+</head>
+<body>
+<header>
+  <img src="https://www.ledistrib.fr/wp-content/uploads/2026/02/LeDistrib-logo-1024x299.png" alt="Le Distrib">
+  <span class="qui" id="qui"></span>
+</header>
+<main>
+  <div id="err" class="err cache"></div>
+
+  <section id="ecranCle" class="cache">
+    <div class="carte"><h1>Lien incomplet</h1><p class="sous">Ouvre l'application avec le lien personnel envoyé par Gaëtan.</p></div>
+  </section>
+
+  <section id="ecranAccueil" class="cache">
+    <h1 id="bonjour">Suivi des appels</h1>
+    <p class="sous">Raccroche, dicte ton compte rendu, vérifie, valide. Le CRM et ton agenda se mettent à jour.</p>
+    <div class="carte">
+      <div class="etapes"><div><b>1</b>Tu parles</div><div><b>2</b>Tu vérifies</div><div><b>3</b>Tu valides</div></div>
+    </div>
+    <div class="carte micro-zone">
+      <button class="micro" id="btnMicro" onclick="basculerMicro()" aria-label="Enregistrer">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-2.08A7 7 0 0 0 19 12h-2Z"/></svg>
+      </button>
+      <div class="chrono" id="chrono">0:00</div>
+      <div class="aide" id="aideMicro">Appuie et parle : commune, interlocuteur, ce qui a été dit, la suite.</div>
+      <button class="lien" onclick="basculerTexte()">Je préfère écrire</button>
+    </div>
+    <div class="carte cache" id="zoneTexte">
+      <label for="texte">Ton compte rendu</label>
+      <textarea id="texte" placeholder="Ex : appel mairie de Gouy, la secrétaire Mme Martin, intéressés, rappeler lundi 10h pour parler au maire."></textarea>
+      <button class="btn btn-bleu" onclick="envoyerTexte()">Analyser mon compte rendu</button>
+    </div>
+  </section>
+
+  <section id="ecranAttente" class="cache">
+    <div class="attente"><div class="roue"></div><div id="msgAttente">Analyse en cours…</div><div class="petit" style="margin-top:6px">Ça prend en général 10 à 30 secondes.</div></div>
+  </section>
+
+  <section id="ecranFiche" class="cache">
+    <h1>Vérifie la fiche</h1>
+    <p class="sous">Corrige si besoin, puis valide.</p>
+    <div class="carte">
+      <label>Commune</label>
+      <div id="choixCommunes"></div>
+      <div class="recherche"><input id="autreCommune" placeholder="Autre commune"><button class="btn btn-clair" onclick="chercher()">Chercher</button></div>
+    </div>
+    <div class="carte">
+      <label for="fResultat">Résultat de l'appel</label><select id="fResultat"></select>
+      <label for="fInterlocuteur">Interlocuteur</label><input id="fInterlocuteur">
+      <label for="fResume">Résumé</label><textarea id="fResume"></textarea>
+      <label for="fAction">Prochaine action</label><input id="fAction">
+      <div class="ligne2"><div><label for="fDateRappel">Rappel le</label><input type="date" id="fDateRappel"></div><div><label for="fHeureRappel">à</label><input type="time" id="fHeureRappel"></div></div>
+      <div class="ligne2"><div><label for="fDateRdv">RDV sur place le</label><input type="date" id="fDateRdv"></div><div><label for="fHeureRdv">à</label><input type="time" id="fHeureRdv"></div></div>
+      <label class="case"><input type="checkbox" id="fNpc"> Ne plus contacter</label>
+      <details><summary>Ce que tu as dit</summary><div class="transcr" id="fTranscription"></div></details>
+    </div>
+    <div class="carte">
+      <label>Tu as oublié quelque chose ?</label>
+      <div class="complement-rec">
+        <button class="mini-micro" id="btnComp" onclick="basculerComplement()" aria-label="Compléter à la voix">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-2.08A7 7 0 0 0 19 12h-2Z"/></svg>
+        </button>
+        <div class="petit" id="aideComp">Appuie et dis juste ce qui manque. La fiche se met à jour, le reste est gardé.</div>
+      </div>
+    </div>
+    <button class="btn btn-rouge" onclick="valider()">Valider et enregistrer</button>
+    <button class="btn btn-clair" onclick="recommencer()">Annuler</button>
+  </section>
+
+  <section id="ecranFin" class="cache">
+    <div class="carte" style="text-align:center"><div class="ok">✓</div><div id="bilan"></div></div>
+    <button class="btn btn-rouge" onclick="recommencer()">Nouvel appel</button>
+  </section>
+</main>
+
+<script>
+const API = 'https://script.google.com/macros/s/AKfycbzn92nlgNbxlAz1j2ii8is320C1FFUCKLNtatm63LqEADXvqSKyqfLhKS_qHpz6SxX5/exec';
+const MAX_SEC = 240;
+let CLE = '', session = null, ligneChoisie = null, candidats = [], ficheCourante = null;
+let rec = null; // enregistrement en cours : { ctx, source, proc, flux, morceaux, taux, t0, minuteur, cible }
+
+function $(id) { return document.getElementById(id); }
+function montrer(id) { ['ecranCle','ecranAccueil','ecranAttente','ecranFiche','ecranFin'].forEach(e => $(e).classList.toggle('cache', e !== id)); window.scrollTo(0, 0); }
+function erreur(m) { const z = $('err'); z.textContent = m || ''; z.classList.toggle('cache', !m); if (m) window.scrollTo(0, 0); }
+function echap(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c])); }
+
+async function api(action, donnees) {
+  let r;
+  try {
+    r = await fetch(API, { method:'POST', redirect:'follow', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ action, k: CLE }, donnees || {})) });
+  } catch (e) { throw new Error('Pas de connexion au serveur. Vérifie ton réseau et réessaie.'); }
+  let j;
+  try { j = await r.json(); } catch (e) { throw new Error('Réponse illisible du serveur (code ' + r.status + '). Réessaie dans une minute.'); }
+  if (!j.ok) throw new Error(j.erreur || 'Erreur inconnue.');
+  return j.data;
+}
+
+// ---------- Micro : enregistrement WAV 16 kHz mono ----------
+async function demarrerMicro(cible) {
+  erreur('');
+  let flux;
+  try { flux = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation:true, noiseSuppression:true } }); }
+  catch (e) { erreur("Micro refusé. Sur iPhone : Réglages > Safari > Micro > Autoriser, puis recharge la page. Tu peux aussi écrire ton compte rendu."); return false; }
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  if (ctx.state === 'suspended') await ctx.resume();
+  const source = ctx.createMediaStreamSource(flux);
+  const proc = ctx.createScriptProcessor(4096, 1, 1);
+  const morceaux = [];
+  proc.onaudioprocess = ev => morceaux.push(new Float32Array(ev.inputBuffer.getChannelData(0)));
+  source.connect(proc); proc.connect(ctx.destination);
+  rec = { ctx, source, proc, flux, morceaux, taux: ctx.sampleRate, t0: Date.now(), cible };
+  rec.minuteur = setInterval(() => {
+    const s = Math.floor((Date.now() - rec.t0) / 1000);
+    if (cible === 'principal') $('chrono').textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+    else $('aideComp').textContent = 'Je t\'écoute… ' + s + ' s. Appuie pour terminer.';
+    if (s >= MAX_SEC) arreterMicro();
+  }, 250);
+  return true;
+}
+
+function arreterMicro() {
+  if (!rec) return null;
+  const r = rec; rec = null;
+  clearInterval(r.minuteur);
+  try { r.source.disconnect(); r.proc.disconnect(); } catch (e) {}
+  r.flux.getTracks().forEach(t => t.stop());
+  r.ctx.close();
+  const duree = (Date.now() - r.t0) / 1000;
+  if (duree < 1.5) return { cible: r.cible, trop_court: true };
+  return { cible: r.cible, b64: wavBase64(r.morceaux, r.taux) };
+}
+
+function wavBase64(morceaux, taux) {
+  const total = morceaux.reduce((n, m) => n + m.length, 0);
+  const brut = new Float32Array(total); let p = 0;
+  morceaux.forEach(m => { brut.set(m, p); p += m.length; });
+  const cible = 16000, ratio = taux / cible, n = Math.floor(total / ratio);
+  const buf = new ArrayBuffer(44 + n * 2), v = new DataView(buf);
+  const ecr = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  ecr(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); ecr(8, 'WAVE'); ecr(12, 'fmt ');
+  v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, cible, true); v.setUint32(28, cible * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+  ecr(36, 'data'); v.setUint32(40, n * 2, true);
+  for (let i = 0; i < n; i++) {
+    const a = Math.floor(i * ratio), b = Math.min(total, Math.floor((i + 1) * ratio));
+    let s = 0; for (let j = a; j < b; j++) s += brut[j];
+    const x = Math.max(-1, Math.min(1, s / Math.max(1, b - a)));
+    v.setInt16(44 + i * 2, x < 0 ? x * 0x8000 : x * 0x7FFF, true);
+  }
+  const octets = new Uint8Array(buf); let bin = '';
+  for (let i = 0; i < octets.length; i += 0x8000) bin += String.fromCharCode.apply(null, octets.subarray(i, i + 0x8000));
+  return btoa(bin);
+}
+
+async function basculerMicro() {
+  if (rec && rec.cible === 'principal') {
+    const r = arreterMicro();
+    $('btnMicro').classList.remove('rec'); $('aideMicro').textContent = 'Appuie et parle : commune, interlocuteur, ce qui a été dit, la suite.';
+    if (!r || r.trop_court) { $('chrono').textContent = '0:00'; erreur('Enregistrement trop court. Réessaie.'); return; }
+    analyser({ audio: r.b64, mime: 'audio/wav' }, 'Analyse de ton vocal…');
+    return;
+  }
+  if (rec) return;
+  if (await demarrerMicro('principal')) {
+    $('btnMicro').classList.add('rec'); $('aideMicro').textContent = 'Je t\'écoute. Appuie à nouveau pour terminer.';
+  }
+}
+
+async function basculerComplement() {
+  if (rec && rec.cible === 'complement') {
+    const r = arreterMicro();
+    $('btnComp').classList.remove('rec'); $('aideComp').textContent = 'Appuie et dis juste ce qui manque. La fiche se met à jour, le reste est gardé.';
+    if (!r || r.trop_court) { erreur('Complément trop court. Réessaie.'); return; }
+    analyser({ audio: r.b64, mime: 'audio/wav', texte: texteActuel() }, 'J\'ajoute ton complément…');
+    return;
+  }
+  if (rec) return;
+  if (await demarrerMicro('complement')) $('btnComp').classList.add('rec');
+}
+
+// Ce qui est déjà compris, corrections manuelles comprises, pour que le complément ne perde rien.
+function texteActuel() {
+  const f = lireFiche();
+  return [f.transcription,
+    '(Fiche déjà vérifiée par le commercial : résultat ' + f.resultat + ' ; interlocuteur ' + f.interlocuteur + ' ; résumé ' + f.resume +
+    ' ; prochaine action ' + f.prochaine_action + ' ; rappel ' + f.date_rappel + ' ' + f.heure_rappel + ' ; RDV ' + f.date_rdv + ' ' + f.heure_rdv + ')'
+  ].join('\n');
+}
+
+// ---------- Écrans ----------
+function basculerTexte() { $('zoneTexte').classList.toggle('cache'); if (!$('zoneTexte').classList.contains('cache')) $('texte').focus(); }
+function envoyerTexte() {
+  const t = $('texte').value.trim();
+  if (!t) { erreur('Écris ton compte rendu d\'abord.'); return; }
+  analyser({ texte: t }, 'Analyse de ton compte rendu…');
+}
+
+async function analyser(donnees, msg) {
+  erreur(''); $('msgAttente').textContent = msg; montrer('ecranAttente');
+  const retour = ficheCourante ? 'ecranFiche' : 'ecranAccueil';
+  try { afficherFiche(await api('analyser', donnees)); }
+  catch (e) { erreur(e.message); montrer(retour); }
+}
+
+function afficherFiche(r) {
+  session = r.id; candidats = r.candidats || []; ligneChoisie = null; ficheCourante = r.fiche;
+  const f = r.fiche;
+  $('fResultat').innerHTML = (r.resultats || []).map(x => '<option' + (x === f.resultat ? ' selected' : '') + '>' + echap(x) + '</option>').join('');
+  $('fInterlocuteur').value = f.interlocuteur || '';
+  $('fResume').value = f.resume || '';
+  $('fAction').value = f.prochaine_action || '';
+  $('fDateRappel').value = f.date_rappel || ''; $('fHeureRappel').value = f.heure_rappel || '';
+  $('fDateRdv').value = f.date_rdv || ''; $('fHeureRdv').value = f.heure_rdv || '';
+  $('fNpc').checked = !!f.ne_plus_contacter;
+  $('fTranscription').textContent = f.transcription || '';
+  $('autreCommune').value = candidats.length ? '' : (f.commune || '');
+  dessinerCommunes(f.commune);
+  montrer('ecranFiche');
+}
+
+function dessinerCommunes(entendu) {
+  const z = $('choixCommunes');
+  if (!candidats.length) {
+    z.innerHTML = '<div class="petit">Commune « ' + echap(entendu || '?') + ' » introuvable sur ta route. Tape le nom (même approximatif) puis « Chercher ».</div>';
+    return;
+  }
+  if (candidats.length === 1) ligneChoisie = candidats[0].ligne;
+  z.innerHTML = candidats.map(c => '<div class="choix' + (c.ligne === ligneChoisie ? ' actif' : '') + '" onclick="choisir(' + c.ligne + ')"><b>' + echap(c.commune) + '</b>' +
+    (c.exact ? '' : ' <span class="petit">(nom proche)</span>') + '<div class="petit">' + echap(c.maire) + ' · ' + echap(c.tel) + (c.etape ? ' · ' + echap(c.etape) : '') + '</div></div>').join('');
+}
+function choisir(l) { ligneChoisie = l; dessinerCommunes(''); }
+
+async function chercher() {
+  const n = $('autreCommune').value.trim();
+  if (!n) return;
+  erreur('');
+  try { candidats = await api('rechercher', { id: session, commune: n }); ligneChoisie = null; dessinerCommunes(n); }
+  catch (e) { erreur(e.message); }
+}
+
+function lireFiche() {
+  return {
+    resultat: $('fResultat').value, interlocuteur: $('fInterlocuteur').value.trim(), resume: $('fResume').value.trim(),
+    prochaine_action: $('fAction').value.trim(), date_rappel: $('fDateRappel').value, heure_rappel: $('fHeureRappel').value,
+    date_rdv: $('fDateRdv').value, heure_rdv: $('fHeureRdv').value, ne_plus_contacter: $('fNpc').checked,
+    transcription: $('fTranscription').textContent
+  };
+}
+
+async function valider() {
+  erreur('');
+  if (!ligneChoisie) { erreur('Choisis la commune.'); return; }
+  $('msgAttente').textContent = 'Enregistrement dans le CRM et l\'agenda…'; montrer('ecranAttente');
+  try {
+    const r = await api('valider', { id: session, ligne: ligneChoisie, fiche: lireFiche() });
+    $('bilan').innerHTML = '<b style="color:var(--bleu);font-size:18px">Enregistré : ' + echap(r.commune) + '</b><div class="petit" style="margin-top:10px;text-align:left">' +
+      Object.keys(r.ecrit || {}).map(k => '<b>' + echap(k) + '</b> : ' + echap(r.ecrit[k])).join('<br>') + '</div>' +
+      (r.agenda ? '<div style="margin-top:12px">📅 ' + echap(r.agenda.titre) + ', le ' + echap(r.agenda.debut) + '</div>' : '');
+    $('texte').value = ''; ficheCourante = null;
+    montrer('ecranFin');
+  } catch (e) { erreur(e.message); montrer('ecranFiche'); }
+}
+
+function recommencer() { erreur(''); session = null; ligneChoisie = null; ficheCourante = null; $('chrono').textContent = '0:00'; montrer('ecranAccueil'); }
+
+// ---------- Démarrage : la clé vient du lien ?k=, puis est gardée sur le téléphone ----------
+(async function () {
+  const p = new URLSearchParams(location.search).get('k');
+  try { if (p) localStorage.setItem('ld_cle', p); CLE = p || localStorage.getItem('ld_cle') || ''; } catch (e) { CLE = p || ''; }
+  if (!CLE) { montrer('ecranCle'); return; }
+  montrer('ecranAccueil');
+  try { const u = await api('profil'); $('bonjour').textContent = 'Bonjour ' + u.prenom; $('qui').textContent = u.prenom; }
+  catch (e) { erreur(e.message); }
+})();
+</script>
+</body>
+</html>
