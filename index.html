@@ -94,6 +94,15 @@
     <div class="poppins cache" id="chrono" style="font-size:26px; font-weight:600">0:00</div>
     <div class="monte" id="aideMicro" style="animation-delay:1.3s; font-size:15px; color:rgba(255,255,255,.85); text-align:center">Appuyez sur le logo et racontez</div>
   </div>
+  <div class="carte cache" id="carteRevue" style="padding:14px; display:flex; flex-direction:column; gap:10px">
+    <div class="poppins" style="font-size:15px; font-weight:700; color:var(--bleu); padding:0 4px">Votre enregistrement · <span id="dureeRevue">0:00</span></div>
+    <audio id="lecteur" controls preload="auto" style="width:100%; height:40px"></audio>
+    <div style="display:flex; gap:8px">
+      <button class="chip" style="flex:1; height:42px" onclick="ajouterEnregistrement()">+ Ajouter</button>
+      <button class="chip" style="flex:1; height:42px" onclick="recommencerEnregistrement()">Recommencer</button>
+    </div>
+    <button class="btn btn-rouge" onclick="analyserEnregistrement()">Analyser</button>
+  </div>
   <div class="carte monte" id="carteRappels" style="animation-delay:1.6s; padding:14px; display:flex; flex-direction:column; gap:8px">
     <div class="poppins" id="titreRappels" style="font-size:15px; font-weight:700; color:var(--bleu); padding:0 4px">Vos rappels</div>
     <div id="listeRappels" style="display:flex; flex-direction:column; gap:8px"><div style="font-size:14px; color:var(--gris); padding:4px">Chargement…</div></div>
@@ -184,6 +193,7 @@ const MAX_SEC = 240;
 const COURT = { 'Joint, intéressé': 'Intéressé', 'Joint, à rappeler': 'À rappeler', 'RDV pris': 'RDV pris', 'Refus': 'Refus', 'Pas joint (messagerie, absent)': 'Pas joint', 'Autre': 'Autre' };
 let CLE = '', session = null, ligneChoisie = null, candidats = [], resultats = [], resultat = '', ficheCourante = null, modeChoix = false;
 let rec = null;
+let enregistrement = { morceaux: [], taux: 0, duree: 0 }, urlLecteur = null;
 
 function $(id) { return document.getElementById(id); }
 function montrer(id) { ['ecranCle','ecranAccueil','ecranAttente','ecranFiche','ecranFin'].forEach(e => $(e).classList.toggle('cache', e !== id)); }
@@ -218,7 +228,7 @@ async function demarrerMicro(cible) {
   rec = { ctx, source, proc, flux, morceaux, taux: ctx.sampleRate, t0: Date.now(), cible };
   rec.minuteur = setInterval(() => {
     const s = Math.floor((Date.now() - rec.t0) / 1000);
-    if (cible === 'principal') $('chrono').textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+    if (cible === 'principal') $('chrono').textContent = fmt(s + enregistrement.duree);
     else $('aideComp').textContent = 'Je vous écoute… ' + s + ' s. Appuyez pour terminer.';
     if (s >= MAX_SEC) { if (cible === 'principal') basculerMicro(); else basculerComplement(); }
   }, 250);
@@ -232,8 +242,9 @@ function arreterMicro() {
   try { r.source.disconnect(); r.proc.disconnect(); } catch (e) {}
   r.flux.getTracks().forEach(t => t.stop());
   r.ctx.close();
-  if ((Date.now() - r.t0) / 1000 < 1.5) return { trop_court: true };
-  return { b64: wavBase64(r.morceaux, r.taux) };
+  const duree = (Date.now() - r.t0) / 1000;
+  if (duree < 1.5) return { trop_court: true };
+  return { morceaux: r.morceaux, taux: r.taux, duree: duree };
 }
 
 function wavBase64(morceaux, taux) {
@@ -263,13 +274,15 @@ async function basculerMicro() {
     const r = arreterMicro();
     $('zoneLogo').classList.remove('enreg'); $('chrono').classList.add('cache');
     $('aideMicro').textContent = 'Appuyez sur le logo et racontez';
-    if (!r || r.trop_court) { erreur('Enregistrement trop court. Réessayez.'); return; }
-    analyser({ audio: r.b64, mime: 'audio/wav' }, 'Je prépare votre fiche');
+    if (!r || r.trop_court) { erreur('Enregistrement trop court. Réessayez.'); if (enregistrement.morceaux.length) montrerRevue(); return; }
+    if (enregistrement.taux && enregistrement.taux !== r.taux) enregistrement = { morceaux: [], taux: 0, duree: 0 };
+    enregistrement.morceaux = enregistrement.morceaux.concat(r.morceaux); enregistrement.taux = r.taux; enregistrement.duree += r.duree;
+    montrerRevue();
     return;
   }
   if (rec) return;
   if (await demarrerMicro('principal')) {
-    $('zoneLogo').classList.add('enreg'); $('chrono').textContent = '0:00'; $('chrono').classList.remove('cache');
+    cacherRevue(); $('zoneLogo').classList.add('enreg'); $('chrono').textContent = '0:00'; $('chrono').classList.remove('cache');
     $('aideMicro').textContent = 'Je vous écoute. Appuyez à nouveau pour terminer.';
   }
 }
@@ -279,7 +292,7 @@ async function basculerComplement() {
     const r = arreterMicro();
     $('btnComp').style.animation = ''; $('aideComp').textContent = 'Appuyez et complétez à la voix.';
     if (!r || r.trop_court) { erreur('Complément trop court. Réessayez.'); return; }
-    analyser({ audio: r.b64, mime: 'audio/wav', texte: texteActuel() }, "J'ajoute votre complément");
+    analyser({ audio: wavBase64(r.morceaux, r.taux), mime: 'audio/wav', texte: texteActuel() }, "J'ajoute votre complément");
     return;
   }
   if (rec) return;
@@ -292,6 +305,28 @@ function texteActuel() {
     '(Fiche déjà vérifiée par le commercial : résultat ' + f.resultat + ' ; interlocuteur ' + f.interlocuteur + ' ; résumé ' + f.resume +
     ' ; prochaine action ' + f.prochaine_action + ' ; rappel ' + f.date_rappel + ' ' + f.heure_rappel + ' ; RDV ' + f.date_rdv + ' ' + f.heure_rdv + ')'
   ].join('\n');
+}
+
+// ---------- Revue de l'enregistrement avant analyse ----------
+function fmt(s) { s = Math.round(s); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+function montrerRevue() {
+  if (urlLecteur) URL.revokeObjectURL(urlLecteur);
+  const bin = atob(wavBase64(enregistrement.morceaux, enregistrement.taux));
+  const oct = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) oct[i] = bin.charCodeAt(i);
+  urlLecteur = URL.createObjectURL(new Blob([oct], { type: 'audio/wav' }));
+  $('lecteur').src = urlLecteur;
+  $('dureeRevue').textContent = fmt(enregistrement.duree);
+  $('carteRappels').classList.add('cache'); $('carteRevue').classList.remove('cache');
+  $('aideMicro').textContent = 'Réécoutez, complétez ou lancez l\'analyse';
+}
+function cacherRevue() { try { $('lecteur').pause(); } catch (e) {} $('carteRevue').classList.add('cache'); $('carteRappels').classList.remove('cache'); }
+function ajouterEnregistrement() { basculerMicro(); }
+function recommencerEnregistrement() { enregistrement = { morceaux: [], taux: 0, duree: 0 }; cacherRevue(); $('aideMicro').textContent = 'Appuyez sur le logo et racontez'; }
+function analyserEnregistrement() {
+  const b64 = wavBase64(enregistrement.morceaux, enregistrement.taux);
+  enregistrement = { morceaux: [], taux: 0, duree: 0 }; cacherRevue();
+  $('aideMicro').textContent = 'Appuyez sur le logo et racontez';
+  analyser({ audio: b64, mime: 'audio/wav' }, 'Je prépare votre fiche');
 }
 
 // ---------- Volets ----------
